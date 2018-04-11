@@ -1,21 +1,19 @@
 # git-commit-ectomy
 
-perform a git-commit-ectomy to forever remove problematic commits from your repo history
+Perform a git-commit-ectomy to forever remove problematic commits from your repo history.
 
-this uses [git-forget-blob.sh](https://tinyurl.com/git-commit-ectomy)
+This uses the [git-forget-blob.sh](https://tinyurl.com/git-commit-ectomy) script from @nachoparker.
 
 # requirements
 
-This utility utilizes GNU xargs. 
+This guide utilizes GNU xargs. 
 You should run it on Linux, 
 or use Homebrew's gxargs if 
 on a Mac.
 
 # demo surgery
 
-Perform a demo surgery.
-
-Clone an example repo:
+Clone an example repo for performing surgery:
 
 ```
 $ git clone https://github.com/charlesreid1/git-commit-ectomy-example
@@ -86,7 +84,11 @@ done
 git push origin master
 ```
 
-Now you should see them in the commit history:
+I also added two dummy files `foo.txt` and `bar.txt` 
+to illustrate the impact of the surgery on 
+commit history.
+
+Now you should see everything in the commit history:
 
 `![Repo commit history](/img/history.png)`
 
@@ -145,7 +147,7 @@ repo is still the same:
 
 ```
 $ du -hs .git
- 50M	.git
+ 50M    .git
 ```
 
 Git is cursed with perfect memory, and will not
@@ -182,7 +184,7 @@ Now check if it worked:
 
 ```
 $ du -hs .git
- 40M	.git
+ 40M    .git
  ```
  
 Success!
@@ -219,7 +221,11 @@ beb8b4f Adding cat
 84d894e Adding bat
 ```
 
-Note that the "Add cat" commit IDs are identical, but every commit after `dat` was added to the repo is changed. This is because each commit ID is computed using the hash of the prior commit, so if we change one commit ID in history, we change all subsequent commit IDs.
+Note that the "Add cat" commit IDs are identical, 
+but every commit after `dat` was added to the repo is changed. 
+
+This is because each commit ID is computed using the hash of the prior commit, 
+so if we change one commit ID in history, we change all subsequent commit IDs.
 
 ## stitch the patient back up
 
@@ -233,7 +239,7 @@ commit hashes.
 
 At this point, we have two separate, parallel 
 `master` branches that split when our 
-file `rat` was added to the repo.
+file `dat` was added to the repo.
 
 If we simply push our branch to the Github remote,
 we will have a huge headache: every commit will have 
@@ -259,23 +265,9 @@ And a screenshot of the repo after:
 
 ![Commit history after git-forget-blob](/img/after.png)
 
-# more advanced surgery
+# tips for surgery
 
-exploring repercussions:
-* add files, 
-* make dummy changes
-* remove files,
-* make dummy changes
-* re-add files,
-* make dummy changes
-* remove files,
-* make dummy changes
-
-Which commits change - all of history since file was added?
-
-# becoming a surgeon
-
-To become a surgeon in real life, start by sizing up your patient.
+**Size up your patient.**
 
 This one-liner lists the 40 largest files in the repo
 (modify the tail line to change the number):
@@ -296,8 +288,7 @@ $ git rev-list --all --objects | \
      sort -n -k1
 ```
 
-You should, if necessary, back up the files you will remove
-before proceeding.
+**Get your patient some insurance.** Back up any files 
+you want to remove but keep.
 
-(TBC...)
 
