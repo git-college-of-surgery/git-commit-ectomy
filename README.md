@@ -137,7 +137,7 @@ $ du -hs .git
  50M	.git
 ```
 
-Now remove dat using `git rm`:
+Now remove `dat` using `git rm`:
 
 ```
 $ git rm dat
@@ -160,7 +160,7 @@ forget a large file that's been added to the repo.
 ## git forget blob
 
 We use `git-forget-blob.sh` to permanenty remove 
-rat from the repo history and rewrite all commits
+`dat` from the repo history and rewrite all commits
 since the file was added:
 
 ```
@@ -195,7 +195,7 @@ Success!
 
 ## how it worked
 
-If we check the git log we can see what happened - all commits involving rat were rewritten. Because git uses the prior commit's hash to make the next commit's hash, _we will rewrite every commit since the first time the file we forgot was added to the repo_:
+If we check the git log we can see what happened - all commits involving `dat` were rewritten. Because git uses the prior commit's hash to make the next commit's hash, _we will rewrite every commit since the first time `dat` was added to the repo_:
 
 New log:
 
