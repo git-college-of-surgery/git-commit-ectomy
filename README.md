@@ -29,7 +29,11 @@ For example, to create a 10 MB file:
 $ dd if=/dev/urandom of=my_big_fat_file bs=1048576 count=10
 ```
 
-Note: `1048576 = 2^20` bytes comes from
+**Important:** You must use `/dev/urandom` with a non-zero block size.
+If you use `/dev/zeros` then each file will be identical and git 
+will not store them separately. Then your surgery will go very badly.
+
+**Note:** `1048576 = 2^20` bytes comes from
 1 KB = `2^10` bytes, and 1 MB = `2^10` KB, 
 for a total of `2^20` bytes per megabyte.
 
