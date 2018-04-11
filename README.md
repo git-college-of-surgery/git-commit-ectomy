@@ -94,7 +94,7 @@ commit history.
 
 Now you should see everything in the commit history:
 
-`![Repo commit history](/img/history.png)`
+![Repo commit history](/img/history.png)
 
 Locally in git log:
 
