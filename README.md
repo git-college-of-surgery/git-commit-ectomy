@@ -31,7 +31,11 @@ For example, to create a 10 MB file:
 $ dd if=/dev/urandom of=my_big_fat_file bs=1048576 count=10
 ```
 
-Note: `1048576 = 2^20` bytes comes from
+**Important:** You must use `/dev/urandom` with a non-zero block size.
+If you use `/dev/zeros` then each file will be identical and git 
+will not store them separately. Then your surgery will go very badly.
+
+**Note:** `1048576 = 2^20` bytes comes from
 1 KB = `2^10` bytes, and 1 MB = `2^10` KB, 
 for a total of `2^20` bytes per megabyte.
 
@@ -92,7 +96,7 @@ commit history.
 
 Now you should see everything in the commit history:
 
-`![Repo commit history](/img/history.png)`
+![Repo commit history](/img/history.png)
 
 Locally in git log:
 
@@ -135,7 +139,7 @@ $ du -hs .git
  50M	.git
 ```
 
-Now remove dat using `git rm`:
+Now remove `dat` using `git rm`:
 
 ```
 $ git rm dat
@@ -158,7 +162,7 @@ forget a large file that's been added to the repo.
 ## git forget blob
 
 We use `git-forget-blob.sh` to permanenty remove 
-rat from the repo history and rewrite all commits
+`dat` from the repo history and rewrite all commits
 since the file was added:
 
 ```
@@ -193,7 +197,7 @@ Success!
 
 ## how it worked
 
-If we check the git log we can see what happened - all commits involving rat were rewritten. Because git uses the prior commit's hash to make the next commit's hash, _we will rewrite every commit since the first time the file we forgot was added to the repo_:
+If we check the git log we can see what happened - all commits involving `dat` were rewritten. Because git uses the prior commit's hash to make the next commit's hash, _we will rewrite every commit since the first time `dat` was added to the repo_:
 
 New log:
 
