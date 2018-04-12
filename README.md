@@ -122,12 +122,18 @@ $ chmod +x git-forget-blob.sh
 ```
 
 If you are on a Mac, edit the file to change
-2 occurrences of `xargs` to `gxargs`.
+2 occurrences of `xargs` to `gxargs`, or just 
+install the GNU version of the utilities 
+in place:
+
+```
+brew install gnu-sed --with-default-names
+```
 
 To use it:
 
 ```
-        ./git-forget-blob.sh <name-of-file>
+./git-forget-blob.sh <name-of-file>
 ```
 
 ## git rm
