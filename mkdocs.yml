@@ -5,10 +5,10 @@ theme:
   name: null
   custom_dir: 'mkdocs-material/material'
   palette:
-    primary: 'deep orange'
-    accent: 'deep orange'
+    primary: 'orange'
+    accent: 'orange'
   logo:
-    icon: 'dns'
+    icon: 'announcement'
   font:
     text: 'Roboto'
     code: 'Roboto Mono'
