@@ -191,7 +191,7 @@ Now check if it worked:
 ```
 $ du -hs .git
  40M    .git
- ```
+```
  
 Success!
 
