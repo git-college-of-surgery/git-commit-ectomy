@@ -297,10 +297,31 @@ $ git rev-list --all --objects | \
      while read hash type size; do
           echo -n "-e s/$hash/$size/p ";
      done) | \
-     sort -n -k1
+     sort -n -k1 | \
+     cut -f 2 -d' ' | \
+     xargs -n1 basename 
 ```
 
-**Get your patient some insurance.** Back up any files 
-you want to remove but keep.
+Note that this extracts the filename only, which is what
+`git-forget-blob.sh` needs.
 
+**Get your patient some insurance.** 
+
+Back up any files you want to remove but keep.
+
+**Make sure you specify file names without paths.** 
+
+The `git-forget-blob.sh` script uses blobs in the `.git` directory.
+These do not contain any relative path information about where in the 
+repository a particular file lives. So you should do this:
+
+```
+./git-forget-blob.sh super_huge.file
+```
+
+not this:
+
+```
+./git-forget-blob.sh data/my_project/phase_1/proprietary/super_huge.file  # WRONG
+```
 
