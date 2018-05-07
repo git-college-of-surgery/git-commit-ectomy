@@ -13,7 +13,55 @@ You should run it on Linux,
 or use Homebrew's gxargs if 
 on a Mac.
 
-# demo surgery
+
+# consult with your doctor
+
+You should consult with your doctor to determine if a 
+git-commit-ectomy is right for you.
+
+This one-liner lists the 40 largest files in the repo
+(modify the `tail` line to change the number):
+
+```
+$ git rev-list --all --objects | \
+     sed -n $(git rev-list --objects --all | \
+     cut -f1 -d' ' | \
+     git cat-file --batch-check | \
+     grep blob | \
+     sort -n -k 3 | \
+     \
+     tail -n40 | \
+     \
+     while read hash type size; do
+          echo -n "-e s/$hash/$size/p ";
+     done) | \
+     sort -n -r -k1 
+```
+
+When you're ready to perform the surgery, append 
+two more lines to get the filenames only, which is what 
+`git-forget-blob.sh` needs:
+
+```
+$ git rev-list --all --objects | \
+     sed -n $(git rev-list --objects --all | \
+     cut -f1 -d' ' | \
+     git cat-file --batch-check | \
+     grep blob | \
+     sort -n -k 3 | \
+     \
+     tail -n40 | \
+     \
+     while read hash type size; do
+          echo -n "-e s/$hash/$size/p ";
+     done) | \
+     sort -n -k1 | \
+     cut -f 2 -d' ' | \
+     xargs -n1 basename 
+```
+
+
+# demo surgery: setup
 
 Clone an example repo for performing surgery:
 
@@ -111,26 +159,35 @@ beb8b4f Adding cat
 84d894e Adding bat
 ```
 
-## prep for surgery
+# demo surgery: procedure
+
+## prepare tools
 
 Use [git-forget-blob.sh](https://tinyurl.com/git-commit-ectomy)
 to forget the blob. Start by downloading it:
 
 ```
-$ wget https://tinyurl.com/git-forget-blob-sh -O git-forget-blob.sh
+$ wget https://tinyurl.com/git-forget-blob-mac-sh -O git-forget-blob.sh
 $ chmod +x git-forget-blob.sh
 ```
 
-If you are on a Mac, edit the file to change
-2 occurrences of `xargs` to `gxargs`, or just 
-install the GNU version of the utilities 
-in place:
+This script will detect if you are on a Mac,
+and if so, will use the GNU `gxargs` instead of 
+the BSD `xargs`. This requires GNU tools to be 
+installed via Homebrew:
+
+```
+brew install gnu-sed
+```
+
+Optional: can use `--with-default-names` to overwrite
+BSD versions with GNU versions.
 
 ```
 brew install gnu-sed --with-default-names
 ```
 
-To use it:
+To use the script:
 
 ```
 ./git-forget-blob.sh <name-of-file>
@@ -279,6 +336,26 @@ And a screenshot of the repo after:
 
 # tips for surgery
 
+**Pass the filename _only_ to `git-forget-blob.sh`.**
+
+This is very important!!!
+
+The long one-liner in the "Consult with your Doctor" section
+will list the largest files in the repository, with the relative
+path to that file in the repository.
+
+The git forget blob script needs the name of the file only,
+without a path. 
+
+If you pass it a filename with a path in front, it will not
+permanently remove that file from the git repo, but it will 
+still take a really long time to go through each commit in the
+repo history.
+
+If you are running `git-forget-blob.sh` and the size of the 
+`.git` folder is not going down, this is probably what's 
+going on.
+
 **Size up your patient.**
 
 This one-liner lists the 40 largest files in the repo
@@ -324,4 +401,6 @@ not this:
 ```
 ./git-forget-blob.sh data/my_project/phase_1/proprietary/super_huge.file  # WRONG
 ```
+
+
 
