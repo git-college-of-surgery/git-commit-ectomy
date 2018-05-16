@@ -3,7 +3,9 @@ site_url: https://pages.charlesreid1.com/git-commit-ectomy/
 repo_name: charlesreid1/git-commit-ectomy
 repo_url: https://git.charlesreid1.com/charlesreid1/git-commit-ectomy
 edit_uri: ""
-copyright: 'Copyright &copy; 2018 <a href="https://charlesreid1.com">Charles Reid</a>, released under the <a href="https://git.charlesreid1.com/charlesreid1/git-commit-ectomy/src/branch/master/LICENSE">BSD 3-clause license</a>'
+
+copyright: 'Copyright &copy; 2018 <a href="https://charlesreid1.com">Charles Reid</a>, released under the <a href="https://opensource.org/licenses/BSD-3-Clause">BSD 3-clause license</a>'
+
 docs_dir: docs
 site_dir: site
 extra_css:
@@ -25,3 +27,4 @@ pages:
   - 'Git-Commit-Ectomy the Easy Way: Single Branch' : 'easy.md'
   - 'Complications: Dealing with Branches' : 'branches.md'
   - 'Git-Commit-Ectomy the Hard Way: Cherry Picking' : 'cherrypicking.md'
+  - 'Oh Fuck: Send Reinforcements' : 'ohfuck.md'
