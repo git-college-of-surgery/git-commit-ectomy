@@ -1,0 +1,25 @@
+model for branching: oneflow
+
+http://endoflineblog.com/oneflow-a-git-branching-model-and-workflow
+
+model for branching: gitflow
+
+http://nvie.com/posts/a-successful-git-branching-model/
+
+creating git branch diagrams:
+
+https://zwischenzugs.com/2018/03/08/create-your-own-git-diagrams/
+
+the old graphviz:
+
+```
+graph{
+    a -- b;
+    a -- c;
+    c -- d;
+    d -- e;
+}
+```
+
+dot -Tpng bt.dot -o bt.png
+
