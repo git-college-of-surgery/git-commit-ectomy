@@ -6,15 +6,34 @@ This uses the [git-forget-blob.sh](https://tinyurl.com/git-commit-ectomy) script
 
 ![git-commit-ectomy main banner image](/img/git-commit-ectomy.jpg)
 
+## what is this
+
+This page covers how to perform a git-commit-ectomy.
+This is a procedure that removes problematic files or
+commits from your repository history. 
+
+For example, suppose the intern adds and commits a 1 GB 
+CSV file to your repository. After profusely apologizing,
+the intern removes the 1 GB file, but the damage is done,
+and the 1 GB file will forever bloat `.git`.
+
+Enter the git surgeon. A git surgeon can remove such 
+problematic commits and get the commit history back in 
+shape.
+
 [Visit the Git College of Surgery on Github](https://github.com/git-college-of-surgery)
 
-This surgery can happen one of three ways:
+## the procedure
 
-* [Git-Commit-Ectomy the Easy Way: Single Branch](easy.md)
+This surgical procedure can happen one of three ways:
 
-* [Complications: Dealing with Branches](branches.md)
+* Git-Commit-Ectomy the Easy Way: [Single Branch](easy.md)
 
-* [Git-Commit-Ectomy the Hard Way: Cherry Picking](cherrypicking.md)
+* Complications: [Dealing with Branches](branches.md)
+
+* Git-Commit-Ectomy the Hard Way: [Cherry Picking](cherrypicking.md)
+
+* Oh Fuck: [Please Send Backup](ohfuck.md)
 
 
 # consult with your doctor
