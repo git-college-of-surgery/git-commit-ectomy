@@ -1,8 +1,8 @@
-# Oh Fuck: Please Send Backup
+# Oh F&!k: Please Send Backup
 
-Pretty much what happened to me,
-when I used the single-branch procedure
-instead of the multi-branch procedure.
+When you use the single-branch procedure
+instead of the multi-branch procedure...
+this is what happens.
 
 Possible complications to all of this 
 include:
