@@ -33,7 +33,7 @@ This surgical procedure can happen one of three ways:
 
 * Git-Commit-Ectomy the Hard Way: [Cherry Picking](cherrypicking.md)
 
-* Oh Fuck: [Please Send Backup](ohfuck.md)
+* Oh F&!k: [Please Send Backup](ohfk.md)
 
 
 # consult with your doctor
