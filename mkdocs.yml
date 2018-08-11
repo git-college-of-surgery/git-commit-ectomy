@@ -22,9 +22,12 @@ theme:
     text: 'Roboto'
     code: 'Roboto Mono'
 
-pages:
+nav:
   - 'Index' : 'index.md'
   - 'Git-Commit-Ectomy the Easy Way: Single Branch' : 'easy.md'
   - 'Complications: Dealing with Branches' : 'branches.md'
   - 'Git-Commit-Ectomy the Hard Way: Cherry Picking' : 'cherrypicking.md'
   - 'Oh F&!k: Please Send Backup' : 'ohfk.md'
+
+
+strict: true
