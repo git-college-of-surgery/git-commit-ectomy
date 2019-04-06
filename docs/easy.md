@@ -1,3 +1,27 @@
+This page walks through a demonstration
+git-commit-ectomy that you can perform
+starting with an empty git repository.
+It addresses the single-branch case.
+
+# table of contents
+
+* [requirements](#requirements)
+* [consult with your doctor](#consult-with-your-doctor)
+* [demo surgery: setup](#demo-surgery-setup)
+  * [side note: how to make a fat file](#side-note-how-to-make-a-fat-file)
+  * [step 1: make several fat files](#step-1-make-several-fat-files)
+  * [commit files](#commit-files)
+* [demo surgery: procedure](#demo-surgery-procedure)
+  * [prepare tools](#prepare-tools)
+  * [the command that doesn't work: git rm](#the-command-that-doesnt-work-git-rm)
+  * [the command that does work: git forget blob](#the-command-that-does-work-git-forget-blob)
+  * [how it worked](#how-it-worked)
+  * [stitch the patient back up](#stitch-the-patient-back-up)
+* [tips for surgery](#tips-for-surgery)
+
+<br />
+<br />
+
 # requirements
 
 This guide utilizes GNU xargs. 
@@ -30,9 +54,9 @@ $ git rev-list --all --objects | \
      sort -n -r -k1 
 ```
 
-When you're ready to perform the surgery, append 
-two more lines to get the filenames only, which is what 
-`git-forget-blob.sh` needs:
+When you're ready to perform the surgery, append two more lines to get the
+relative path to the file _only_, without listing the size of the file, which
+is what we will need when we carry out the git-commit-ectomy:
 
 ```
 $ git rev-list --all --objects | \
@@ -47,9 +71,8 @@ $ git rev-list --all --objects | \
      while read hash type size; do
           echo -n "-e s/$hash/$size/p ";
      done) | \
-     sort -n -k1 | \
-     cut -f 2 -d' ' | \
-     xargs -n1 basename 
+     sort -n -r -k1 | \
+     cut -f 2 -d' ' 
 ```
 
 
@@ -61,7 +84,7 @@ Clone an example repo for performing surgery:
 $ git clone https://github.com/charlesreid1/git-commit-ectomy-example
 ```
 
-## how to make a fat file
+## side note: how to make a fat file
 
 Use `dd` to create files by assembling 
 a specified number of bits.
@@ -335,71 +358,48 @@ And a screenshot of the repo after:
 
 # tips for surgery
 
-**Pass the filename _only_ to `git-forget-blob.sh`.**
+**Pass the _relative path to the file_ to `git-forget-blob.sh`.**
 
 This is very important!!!
 
-The long one-liner in the "Consult with your Doctor" section
+The long one-liner in the ["Consult with your Doctor" section](#consult-with-your-doctor)
 will list the largest files in the repository, with the relative
 path to that file in the repository.
 
-The git forget blob script needs the name of the file only,
-without a path. 
-
-If you pass it a filename with a path in front, it will not
-permanently remove that file from the git repo, but it will 
-still take a really long time to go through each commit in the
-repo history.
+If you pass it a filename without a path to the file,
+the script will most likely complain that the file could
+not be found.
 
 If you are running `git-forget-blob.sh` and the size of the 
-`.git` folder is not going down, this is probably what's 
-going on.
+`.git` folder is not going down, it may be because you are
+specifying an incorrect path to the files you are trying to 
+remove.
 
-**Size up your patient.**
+**Size up your patient before you start.**
 
-This one-liner lists the 40 largest files in the repo
-(modify the tail line to change the number):
-
-```
-$ git rev-list --all --objects | \
-     sed -n $(git rev-list --objects --all | \
-     cut -f1 -d' ' | \
-     git cat-file --batch-check | \
-     grep blob | \
-     sort -n -k 3 | \
-     \
-     tail -n40 | \
-     \
-     while read hash type size; do
-          echo -n "-e s/$hash/$size/p ";
-     done) | \
-     sort -n -k1 | \
-     cut -f 2 -d' ' | \
-     xargs -n1 basename 
-```
-
-Note that this extracts the filename only, which is what
-`git-forget-blob.sh` needs.
+Use the one-liner in the ["Consult with your Doctor" section](#consult-with-your-doctor)
+section to size up your patient before you start
+(modify the tail line to change the number of files).
 
 **Get your patient some insurance.** 
 
-Back up any files you want to remove but keep.
+Back up any files you want to remove but still want to keep.
 
-**Make sure you specify file names without paths.** 
+**Make sure you specify relative paths to file names.** 
 
 The `git-forget-blob.sh` script uses blobs in the `.git` directory.
-These do not contain any relative path information about where in the 
-repository a particular file lives. So you should do this:
+These blobs contain relative path information, so you must specify
+the relative path to the file, like this:
 
 ```
-./git-forget-blob.sh super_huge.file
+# CORRECT
+./git-forget-blob.sh data/my_project/phase-1/proprietary/super_huge.file
 ```
 
 not this:
 
 ```
-./git-forget-blob.sh data/my_project/phase_1/proprietary/super_huge.file  # WRONG
+# INCORRECT
+./git-forget-blob.sh super_huge.file
 ```
-
-
 
