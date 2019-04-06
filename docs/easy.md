@@ -182,10 +182,10 @@ brew install gnu-sed --with-default-names
 To use the script:
 
 ```
-./git-forget-blob.sh <name-of-file>
+./git-forget-blob.sh <relative-path-to-file>
 ```
 
-## git rm
+## the command that doesn't work: git rm
 
 Start by checking the size of the repo:
 
@@ -214,7 +214,7 @@ $ du -hs .git
 Git is cursed with perfect memory, and will not
 forget a large file that's been added to the repo.
 
-## git forget blob
+## the command that does work: git forget blob
 
 We use `git-forget-blob.sh` to permanenty remove 
 `dat` from the repo history and rewrite all commits
@@ -239,6 +239,13 @@ Delta compression using up to 4 threads.
 Compressing objects: 100% (19/19), done.
 Writing objects: 100% (20/20), done.
 Total 20 (delta 6), reused 8 (delta 0)
+```
+
+REMEMBER: if `dat` is in a path in the repo, like 
+`path/to/dat`, you have to pass the _full path_:
+
+```
+$ ./git-forget-blob.sh path/to/dat
 ```
 
 Now check if it worked:
