@@ -3,20 +3,23 @@ git-commit-ectomy that you can perform
 starting with an empty git repository.
 It addresses the single-branch case.
 
+<br />
+<br />
+
 # table of contents
 
 * [requirements](#requirements)
 * [consult with your doctor](#consult-with-your-doctor)
 * [demo surgery: setup](#demo-surgery-setup)
-  * [side note: how to make a fat file](#side-note-how-to-make-a-fat-file)
-  * [step 1: make several fat files](#step-1-make-several-fat-files)
-  * [commit files](#commit-files)
+    * [side note: how to make a fat file](#side-note-how-to-make-a-fat-file)
+    * [step 1: make several fat files](#step-1-make-several-fat-files)
+    * [commit files](#commit-files)
 * [demo surgery: procedure](#demo-surgery-procedure)
-  * [prepare tools](#prepare-tools)
-  * [the command that doesn't work: git rm](#the-command-that-doesnt-work-git-rm)
-  * [the command that does work: git forget blob](#the-command-that-does-work-git-forget-blob)
-  * [how it worked](#how-it-worked)
-  * [stitch the patient back up](#stitch-the-patient-back-up)
+    * [prepare tools](#prepare-tools)
+    * [the command that doesn't work: git rm](#the-command-that-doesnt-work-git-rm)
+    * [the command that does work: git forget blob](#the-command-that-does-work-git-forget-blob)
+    * [how it worked](#how-it-worked)
+    * [stitch the patient back up](#stitch-the-patient-back-up)
 * [tips for surgery](#tips-for-surgery)
 
 <br />
