@@ -57,7 +57,7 @@ $ git rev-list --all --objects | \
      sort -n -r -k1 
 ```
 
-When you're ready to perform the surgery, append two more lines to get the
+When you're ready to perform the surgery, append a `cut` command to get the
 relative path to the file _only_, without listing the size of the file, which
 is what we will need when we carry out the git-commit-ectomy:
 
