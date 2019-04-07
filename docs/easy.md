@@ -81,7 +81,9 @@ $ git rev-list --all --objects | \
 
 # demo surgery: setup
 
-Clone an example repo for performing surgery:
+Clone an example repo for performing surgery. You don't _need_
+a remote repository to do the demo surgery, but we will use one
+in our walkthrough.
 
 ```
 $ git clone https://github.com/charlesreid1/git-commit-ectomy-example
@@ -89,9 +91,8 @@ $ git clone https://github.com/charlesreid1/git-commit-ectomy-example
 
 ## side note: how to make a fat file
 
-Use `dd` to create files by assembling 
-a specified number of bits.
-For example, to create a 10 MB file:
+We will use the `dd` command to create files with a specified number
+of bits. For example, to create a 10 MB file, we can issue the command:
 
 ```text
 $ dd if=/dev/urandom of=my_big_fat_file bs=1048576 count=10
@@ -102,30 +103,79 @@ If you use `/dev/zeros` then each file will be identical and git
 will not store them separately. Then your surgery will go very badly.
 
 **Note:** `1048576 = 2^20` bytes comes from
-1 KB = `2^10` bytes, and 1 MB = `2^10` KB, 
+the fact that 1 KB = `2^10` bytes, and 1 MB = `2^10` KB, 
 for a total of `2^20` bytes per megabyte.
 
-count = 10 means we make 10 1mb blocks.
+`count=10` means we make 10 blocks, each of size 1 MB (1048576 bytes).
+
+## make several text files
+
+We start by adding some small boring text files to the repository:
+
+```
+echo "hello foo" > foo.txt
+echo "hello bar" > bar.txt
+```
+
+Now add them to the repo history:
+
+```
+$ for item in `/bin/ls -1 *.txt`; do
+    git add ${item} && git commit ${item} -m "adding ${item}"
+done
+```
+
 
 ## make several fat files
 
-Crank them out. bat cat dat fat rat!
+To demonstrate the importance of specifying the path to the
+large files being removed from the repository, we add several
+10 MB files inside of a subdirectory. Start with the directory
+structure:
 
 ```
+$ mkdir data1; mkdir data2
+```
+
+Now create some files in each of the two directories:
+
+```
+cd data1/
 dd if=/dev/urandom of=bat bs=1048576 count=10
 dd if=/dev/urandom of=cat bs=1048576 count=10
 dd if=/dev/urandom of=dat bs=1048576 count=10
+cd ../
+
+
+cd data2/
 dd if=/dev/urandom of=fat bs=1048576 count=10
 dd if=/dev/urandom of=rat bs=1048576 count=10
+cd ../
 ```
 
-Make sure they are the correct size:
+Now we have the following directory structure:
 
 ```
-$ ls -lhg
+$ tree .
+.
+├── bar.txt
+├── data1
+│   ├── bat
+│   ├── cat
+│   └── dat
+├── data2
+│   ├── fat
+│   └── rat
+└── foo.txt
+```
+
+```
+$ ls -lhg data1
 -rw-r--r--   1 staff    10M Apr 10 18:30 bat
 -rw-r--r--   1 staff    10M Apr 10 18:30 cat
 -rw-r--r--   1 staff    10M Apr 10 18:30 dat
+
+$ ls -lhg data2
 -rw-r--r--   1 staff    10M Apr 10 18:30 fat
 -rw-r--r--   1 staff    10M Apr 10 18:30 rat
 ```
@@ -133,7 +183,7 @@ $ ls -lhg
 Also make sure they are unique (hence `/dev/random` and not `/dev/zero`):
 
 ```
-$ for i in `/bin/ls -1 *at`; do
+$ for i in `/bin/ls -1 data1/*at data2/*at`; do
     md5 ${i}
 done
 
@@ -149,32 +199,32 @@ MD5 (rat) = 77b1c3077041078fd1f371b1bb7dd6e4
 Add the files to the repo in _separate commits_:
 
 ```
-for item in bat cat dat fat rat; do
+for item in data1/bat data1/cat data1/dat data2/fat data2/rat; do
     git add ${item} && git commit ${item} -m "Adding ${item}"
 done
+```
 
+Now push all the commits to the remote (this will take a while):
+
+```
 git push origin master
 ```
 
-I also added two dummy files `foo.txt` and `bar.txt` 
-to illustrate the impact of the surgery on 
-commit history.
-
-Now you should see everything in the commit history:
+Now you should see everything in the commit history on Github:
 
 ![Repo commit history](/img/history.png)
 
-Locally in git log:
+You should also see it locally in the git log:
 
 ```
 $ git log --oneline
-fd76938 Add bar.txt
-8a86eaf Add foo.txt
-c50a272 Adding rat
-423ede3 Adding fat
-b56c10b Adding dat
-beb8b4f Adding cat
-84d894e Adding bat
+902b0d8 (HEAD -> master, origin/master) adding rat
+b3376bd adding fat
+e2427de adding dat
+25682b5 addding cat
+495235a addding bat
+2506d38 adding bar.txt
+2eb8d13 adding foo.txt
 ```
 
 # demo surgery: procedure
@@ -195,21 +245,24 @@ the BSD `xargs`. This requires GNU tools to be
 installed via Homebrew:
 
 ```
-brew install gnu-sed
+brew install gnu-xargs
 ```
 
-Optional: can use `--with-default-names` to overwrite
-BSD versions with GNU versions.
+When installing `gnu-xargs`, you can also add the `--with-default-names` flag
+to `brew` to overwrite the default BSD version of xargs (which is _not_ compatible
+with the GNU version of xargs).
 
 ```
-brew install gnu-sed --with-default-names
+brew install gnu-xargs --with-default-names
 ```
 
-To use the script:
+To use the `git-forget-blob.sh` script:
 
 ```
 ./git-forget-blob.sh <relative-path-to-file>
 ```
+
+(See below for more detail.)
 
 ## the command that doesn't work: git rm
 
@@ -237,89 +290,101 @@ $ du -hs .git
  50M    .git
 ```
 
-Git is cursed with perfect memory, and will not
+Why? Because git is cursed with perfect memory, and will not
 forget a large file that's been added to the repo.
 
 ## the command that does work: git forget blob
 
-We use `git-forget-blob.sh` to permanenty remove 
-`dat` from the repo history and rewrite all commits
-since the file was added:
+To force git to forget a large file that's been added to the repo,
+use the `git-forget-blob.sh` script to permanently remove it.
+Here, we remove the `dat` file from the repo history by modifying
+all commits that involve the `dat` file, and rewriting those commits
+(and, by consequence, all commits that happened after that commit).
+
+Here is how to permanently remove `dat` from the repo history and rewrite
+all commits (we specify `data1/bat` and not `bat`):
 
 ```
-$ ./git-forget-blob.sh dat
-Counting objects: 23, done.
+$ ./git-forget-blob.sh data1/bat
+Enumerating objects: 26, done.
+Counting objects: 100% (26/26), done.
 Delta compression using up to 4 threads.
-Compressing objects: 100% (22/22), done.
-Writing objects: 100% (23/23), done.
-Total 23 (delta 6), reused 0 (delta 0)
-Rewrite 84d894e39d63bbea54a7b8d3d1c85c588adff7ae (1/8) (0 seconds pRewrite beb8b4f2fbb257c0d6098620de7a8df5d7dd74ed (2/8) (0 seconds pRewrite b56c10bafeb95eece9880aa1a52cfc3e4e99045e (3/8) (0 seconds passed, remaining 0 predicted)    rm 'dat'
-Rewrite 423ede37f4d75dbb7a1b8020c561c4d7a926a97f (4/8) (0 seconds passed, remaining 0 predicted)    rm 'dat'
-Rewrite c50a2724f6d722002133b04b0f63f271b861ff9c (5/8) (0 seconds passed, remaining 0 predicted)    rm 'dat'
-Rewrite 8a86eafbb5b669120fa1073cfa7567bbebf2fb2e (6/8) (0 seconds passed, remaining 0 predicted)    rm 'dat'
-Rewrite fd769386dcd32354bad57e8eb057ae8adb2b3c9b (7/8) (0 seconds passed, remaining 0 predicted)    rm 'dat'
-Rewrite d0587c525a5f64d02b1cb46c04261ab285c907f9 (8/8) (0 seconds passed, remaining 0 predicted)
+Compressing objects: 100% (20/20), done.
+Writing objects: 100% (26/26), done.
+Total 26 (delta 1), reused 26 (delta 1)
+Rewrite 495235a86e70be03ee0749733645615a093b547a (3/7) (0 seconds passed, remaining 0 predicted)    rm 'data1/bat'
+Rewrite 25682b53e6c8c88328346fc2e245b5946adec6cb (4/7) (0 seconds passed, remaining 0 predicted)    rm 'data1/bat'
+Rewrite e2427def6f9de095928aaecfd9fef892880e6ce8 (5/7) (0 seconds passed, remaining 0 predicted)    rm 'data1/bat'
+Rewrite b3376bdc847e26bdb323408afa06112dd4c2b36d (6/7) (0 seconds passed, remaining 0 predicted)    rm 'data1/bat'
+Rewrite 902b0d8e46ec8d1487ae3db3b2989dfade5dacbe (7/7) (1 seconds passed, remaining 0 predicted)    rm 'data1/bat'
+
 Ref 'refs/heads/master' was rewritten
-Counting objects: 20, done.
+Enumerating objects: 23, done.
+Counting objects: 100% (23/23), done.
 Delta compression using up to 4 threads.
-Compressing objects: 100% (19/19), done.
-Writing objects: 100% (20/20), done.
-Total 20 (delta 6), reused 8 (delta 0)
+Compressing objects: 100% (18/18), done.
+Writing objects: 100% (23/23), done.
+Total 23 (delta 1), reused 12 (delta 0)
 ```
 
-REMEMBER: if `dat` is in a path in the repo, like 
-`path/to/dat`, you have to pass the _full path_:
-
-```
-$ ./git-forget-blob.sh path/to/dat
-```
-
-Now check if it worked:
+Verify it worked by finding size of `.git` directory
 
 ```
 $ du -hs .git
- 40M    .git
+ 40M	.git
 ```
- 
+
 Success!
+
+Note that if you mistakenly specify the name of the file only,
+without the relative path to the file, git will be looking for
+the file at the top level of the repository, and the file will
+not be found:
+
+```
+$ ./git-forget-blob.sh bat
+Enumerating objects: 26, done.
+Counting objects: 100% (26/26), done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (21/21), done.
+Writing objects: 100% (26/26), done.
+Total 26 (delta 1), reused 0 (delta 0)
+bat not found in repo history
+```
 
 ## how it worked
 
-If we check the git log we can see what happened - all commits involving `dat` were rewritten. Because git uses the prior commit's hash to make the next commit's hash, _we will rewrite every commit since the first time `dat` was added to the repo_:
+If we check the git log we can see what happened - all commits involving 
+`bat` were rewritten. It's important to note that when `git` computes the 
+hash of each commit, it includes the hash of the prior commit - meaning,
+if one commit in a repository's history changes, every commit in a repository's
+history changes.
 
-New log:
+Thus, _we will rewrite every single commit since the very first commit that introduced
+the file we removed_.
 
-```
-$ git log --oneline
-3c10144 Removing dat
-6f7b8f2 Add bar.txt
-3f70da5 Add foo.txt
-5406c1a Adding rat
-df458d0 Adding fat
-5f6e932 Adding dat
-beb8b4f Adding cat
-84d894e Adding bat
-```
-
-Compare to the old log:
+Compare the old and new logs:
 
 ```
-$ git log --oneline
-d0587c5 Removing dat
-fd76938 Add bar.txt
-8a86eaf Add foo.txt
-c50a272 Adding rat
-423ede3 Adding fat
-b56c10b Adding dat
-beb8b4f Adding cat
-84d894e Adding bat
+# NEW LOG                    # OLD LOG                                          
+                                                                                
+$ git log --oneline          $ git log --oneline                                
+5bc57f6 adding rat           902b0d8 adding rat 
+3153621 adding fat           b3376bd adding fat                                 
+c456173 adding dat           e2427de adding dat                                 
+078a5be addding cat          25682b5 addding cat                                
+3cd75ce addding bat          495235a addding bat                                
+2506d38 adding bar.txt       2506d38 adding bar.txt                             
+2eb8d13 adding foo.txt       2eb8d13 adding foo.txt                             
 ```
 
-Note that the "Add cat" commit IDs are identical, 
-but every commit after `dat` was added to the repo is changed. 
+Note that the first two commits, which did not involve
+the `bat` file, remain identical, but every commit
+after `495235a` (which first introduced bat) is changed.
 
-This is because each commit ID is computed using the hash of the prior commit, 
-so if we change one commit ID in history, we change all subsequent commit IDs.
+Each commit hash is computed using the prior commit hash,
+so once commit `495235a` changes, it cascades through the
+entire history by changing all subsequent commit hashes.
 
 ## stitch the patient back up
 
@@ -327,21 +392,21 @@ Of course, for surgeons, as for airline pilots,
 if the last step is screwed up, nothing else counts.
 
 We asked git to forget a file, which it did, 
-but that required modifying commits in the 
-git history, which required re-calculating
-commit hashes.
+but that required modifying git's entire commit 
+history. At this point we have two parallel
+`master` branches - the old history and the new
+history.
 
-At this point, we have two separate, parallel 
-`master` branches that split when our 
-file `dat` was added to the repo.
+If we simply `git push` our branch to the Github remote,
+we will have a huge headache: both histories will end up
+on Github, our git history will contain duplicates of every
+commit, and the old and new history will show up side by 
+side.
 
-If we simply push our branch to the Github remote,
-we will have a huge headache: every commit will have 
-a duplicate, the old branch and the new branch,
-and will show up side-by-side.
-
-To do this correctly, we need to use the force
-when we push:
+To do this _correctly_, we need to use the force
+when we push, which tells the Github remote to rewrite
+whatever commit history it currently has with the 
+commit history that we are pushing.
 
 ```
 $ git push origin master --force
@@ -361,23 +426,6 @@ And a screenshot of the repo after:
 
 # tips for surgery
 
-**Pass the _relative path to the file_ to `git-forget-blob.sh`.**
-
-This is very important!!!
-
-The long one-liner in the ["Consult with your Doctor" section](#consult-with-your-doctor)
-will list the largest files in the repository, with the relative
-path to that file in the repository.
-
-If you pass it a filename without a path to the file,
-the script will most likely complain that the file could
-not be found.
-
-If you are running `git-forget-blob.sh` and the size of the 
-`.git` folder is not going down, it may be because you are
-specifying an incorrect path to the files you are trying to 
-remove.
-
 **Size up your patient before you start.**
 
 Use the one-liner in the ["Consult with your Doctor" section](#consult-with-your-doctor)
@@ -390,19 +438,35 @@ Back up any files you want to remove but still want to keep.
 
 **Make sure you specify relative paths to file names.** 
 
-The `git-forget-blob.sh` script uses blobs in the `.git` directory.
-These blobs contain relative path information, so you must specify
-the relative path to the file, like this:
+The `git-forget-blob.sh` script requires you to specify the
+path to the file you want to remove, _relative to the top
+level directory of the repository_.
+
+Like this:
 
 ```
 # CORRECT
 ./git-forget-blob.sh data/my_project/phase-1/proprietary/super_huge.file
 ```
 
-not this:
+Not like this:
 
 ```
 # INCORRECT
 ./git-forget-blob.sh super_huge.file
 ```
+
+The long one-liner in the ["Consult with your Doctor" section](#consult-with-your-doctor)
+will list the largest files in the repository, with the relative
+path to that file (relative to the root of the repository).
+
+If you pass it a filename without a path to the file,
+the script will most likely complain that the file could
+not be found. But it may attempt to remove the file and 
+rewrite history _anyway_ without removing any files.
+
+If you are running `git-forget-blob.sh` and the size of the 
+`.git` folder is not going down, it may be because you are
+specifying an incorrect path to the files you are trying to 
+remove.
 
