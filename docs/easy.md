@@ -218,7 +218,7 @@ You should also see it locally in the git log:
 
 ```
 $ git log --oneline
-902b0d8 (HEAD -> master, origin/master) adding rat
+902b0d8 adding rat
 b3376bd adding fat
 e2427de adding dat
 25682b5 addding cat
