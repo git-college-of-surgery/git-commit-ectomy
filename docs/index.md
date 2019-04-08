@@ -4,7 +4,7 @@ Perform a git-commit-ectomy to forever remove problematic commits from your repo
 
 This uses the [git-forget-blob.sh](https://tinyurl.com/git-commit-ectomy) script from [@nachoparker](https://github.com/nachoparker).
 
-![git-commit-ectomy main banner image](/img/git-commit-ectomy.jpg)
+![git-commit-ectomy main banner image](img/git-commit-ectomy.jpg)
 
 ## what is this
 
