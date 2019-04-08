@@ -42,7 +42,8 @@ You should consult with your doctor to determine if a
 git-commit-ectomy is right for your repository.
 
 This one-liner lists the 40 largest files in the repo
-(modify the `tail` line to change the number):
+(modify the `tail` line to change the number of items
+returned):
 
 ```
 $ git rev-list --all --objects | \
