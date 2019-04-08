@@ -20,19 +20,19 @@ Enter the git surgeon. A git surgeon can remove such
 problematic commits and get the commit history back in 
 shape.
 
-[Visit the Git College of Surgery on Github](https://github.com/git-college-of-surgery)
+[Git College of Surgery on Github](https://github.com/git-college-of-surgery)
 
 ## the procedure
 
 This surgical procedure can happen one of three ways:
 
-* Git-Commit-Ectomy the Easy Way: [Single Branch](easy.md)
+* Git-Commit-Ectomy the Easy Way: [Single Branch](docs/easy.md)
 
-* Complications: [Dealing with Branches](branches.md)
+* Complications: [Dealing with Branches](docs/branches.md)
 
-* Git-Commit-Ectomy the Hard Way: [Cherry Picking](cherrypicking.md)
+* Git-Commit-Ectomy the Hard Way: [Cherry Picking](docs/cherrypicking.md)
 
-* Oh F&!k: [Please Send Backup](ohfk.md)
+* Oh F&!k: [Please Send Backup](docs/ohfk.md)
 
 
 # consult with your doctor
