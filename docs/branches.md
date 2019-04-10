@@ -12,8 +12,15 @@ It addresses the multi-branch case.
 * [consult with your doctor](#consult-with-your-doctor)
 * [an ascii art crash course in surgery](#an-ascii-art-crash-course-in-surgery)
 * [demo surgery: setup](#demo-surgery-setup)
-    * [step 1: create single branch](#step-1-create-single-branch)
-    * [step 2: create multi\-branch split](#step-2-create-multi-branch-split)
+    * [create initial shared commit history](#create-initial-shared-commit-history)
+    * [create multiple branches](#create-multiple-branches)
+* [demo surgery: procedure](#demo-surgery-procedure)
+    * [git forget blob: cat\_branch1 (branch specific history)](#git-forget-blob-cat_branch1-branch-specific-history)
+    * [git forget blob: cat (shared history)](#git-forget-blob-cat-shared-history)
+        * [forget blob in one branch](#forget-blob-in-one-branch)
+        * [prepare for rebase by tagging commits](#prepare-for-rebase-by-tagging-commits)
+        * [perform rebase operation](#perform-rebase-operation)
+
 
 <br />
 <br />
