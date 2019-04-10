@@ -430,7 +430,6 @@ Check the size of the `.git` directory (before):
 
 ```
 $ du -hs .git
-
 290M	.git
 ```
 
@@ -439,7 +438,6 @@ relative path to `cat_branch1` in the repository:
 
 ```
 $ ./git-forget-blob.sh branch1_data/cat_branch1
-
 Enumerating objects: 89, done.
 Counting objects: 100% (89/89), done.
 Delta compression using up to 4 threads.
@@ -462,7 +460,6 @@ size of the `.git` directory (after):
 
 ```
 $ du -hs .git
-
 100M	.git
 ```
 
@@ -472,7 +469,6 @@ affected:
 
 ```
 $ git lg2
-
 * 4221760 - 2019-04-09 13:45:30 -0700 (4 hours ago) (branch3)
 |           adding branch3_data - C Reid
 | * b83c9aa - 2019-04-09 13:45:28 -0700 (4 hours ago) (branch2)
@@ -531,7 +527,6 @@ repo as resulted from rewriting branch 1 only):
 
 ```
 $ git lg2
-
 * 4221760 - 2019-04-09 13:45:30 -0700 (4 hours ago) (branch3)
 |           adding branch3_data - C Reid
 | * b83c9aa - 2019-04-09 13:45:28 -0700 (4 hours ago) (branch2)
@@ -571,7 +566,6 @@ git checkout branch2
 
 ```
 $ du -hs .git
-
 100M	.git
 ```
 
@@ -579,7 +573,6 @@ Now we run the forget blob script:
 
 ```
 $ ./git-forget-blob.sh data1/cat
-
 Enumerating objects: 43, done.
 Counting objects: 100% (43/43), done.
 Delta compression using up to 4 threads.
@@ -708,8 +701,13 @@ git checkout branch2
 Now rebase branch 1 from the old history onto the new history:
 
 ```
-$ git rebase --onto rebase_dest rebase_src branch1
+$ 
+git rebase --onto rebase_dest rebase_src branch1
+```
 
+You should see output like this:
+
+```
 First, rewinding head to replay your work on top of it...
 Applying: adding branch1_data
 ```
@@ -740,8 +738,13 @@ $ git lg1
 Repeat the process with branch 3:
 
 ```
-$ git rebase --onto rebase_dest rebase_src branch3
+$
+git rebase --onto rebase_dest rebase_src branch3
+```
 
+You will see output like this:
+
+```
 First, rewinding head to replay your work on top of it...
 Applying: adding branch3_data
 ```
@@ -750,7 +753,6 @@ Verify that all three branches now share a commit history:
 
 ```
 $ git lg1
-
 * b5642eb - (5 hours ago) adding branch3_data - C Reid (HEAD -> branch3)
 | * 2af1225 - (5 hours ago) adding branch1_data - C Reid (branch1)
 |/
