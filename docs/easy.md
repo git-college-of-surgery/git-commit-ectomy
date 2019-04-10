@@ -10,6 +10,7 @@ It addresses the single-branch case.
 
 * [requirements](#requirements)
 * [consult with your doctor](#consult-with-your-doctor)
+* [an ascii art crash course in surgery](#an-ascii-art-crash-course-in-surgery)
 * [demo surgery: setup](#demo-surgery-setup)
     * [side note: how to make a fat file](#side-note-how-to-make-a-fat-file)
     * [make some text files](#make-some-text-files)
@@ -79,6 +80,52 @@ git rev-list --all --objects | \
      done) | \
      sort -n -r -k1 | \
      cut -f 2 -d' ' 
+```
+
+
+# an ascii art crash course in surgery
+
+Suppose our patient has a particularly painful 
+and unnaturally large commit located in their
+commit history:
+
+```
+            This is the commit
+             to be "ectomied"
+             \/
+             __
+    o---o---(__)---o---o--o
+
+```
+
+The git commit ectomy will rewrite the history
+without the problematic commit:
+
+```
+             __
+    o---o---(__)---o---o---o   old history
+         \
+          \---o----o---o---o   new history
+
+              /\
+            The problematic commit
+             is modified to be smaller
+              in the new history
+```
+
+If there is only one branch, no branches or tags 
+or labels will refer to the old history, so the
+commits are not kept in the .git directory.
+
+Finally, running a `git push <remote-name> <branch-name> --force`
+will force the old history to be replaced with
+the new history on the remote. Here is the final
+commit history:
+
+```
+    o---o
+         \
+          \---o----o---o---o   new history
 ```
 
 

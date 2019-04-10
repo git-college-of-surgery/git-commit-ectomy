@@ -10,6 +10,7 @@ It addresses the multi-branch case.
 
 * [requirements](#requirements)
 * [consult with your doctor](#consult-with-your-doctor)
+* [an ascii art crash course in surgery](#an-ascii-art-crash-course-in-surgery)
 * [demo surgery: setup](#demo-surgery-setup)
     * [step 1: create single branch](#step-1-create-single-branch)
     * [step 2: create multi\-branch split](#step-2-create-multi-branch-split)
@@ -46,6 +47,92 @@ git rev-list --all --objects | \
           echo -n "-e s/$hash/$size/p ";
      done) | \
      sort -n -r -k1 
+```
+
+
+# an ascii art crash course in surgery
+
+Suppose our patient has a particularly painful 
+and unnaturally large commit located in their
+multi-branch commit history:
+
+```
+            This is the commit
+             to be "ectomied"
+             \/
+             __
+    o---o---(__)---o---o--------o---o---o  branch A
+                        \        
+                         \---o---o---o  branch B
+                          \   
+                           o---o---o  branch C
+```
+
+The commit is first fixed on one of the branches,
+creating a new history. However, the other branches
+still require the old history to be retained:
+
+```
+                     This commit is the last
+                      commit shared by the history
+                       of each of the branches
+                       \/
+
+          ----o----o---o   new (shared) history
+         /              \
+        |                -------o---o---o  branch A
+        |     __
+    o---o----(__)----o---o       old (shared) history
+                          \        
+                           \---o---o---o  branch B
+                            \   
+                             o---o---o  branch C
+
+```
+
+The second step of the procedure is to rebase
+branch B and branch C onto the new history.
+The rebase command requires three pieces of
+information:
+
+* The source commit (where to cut)
+* The destination commit (where to graft)
+* The branch name (how much to cut and graft)
+
+Let us label the diagram above with the rebase
+source and destination commits, and use valid
+git branch names:
+
+```
+          ----o----o---o   rebase_dest
+         /              \
+        |                -------o---o---o  branchA
+        |
+        |     __
+    o---o----(__)----o---o   rebase_src 
+                          \        
+                           \---o---o---o  branchB
+                            \   
+                             o---o---o  branchC
+```
+
+Now the commands to rebase branch B and branch C are:
+
+```
+git rebase --onto rebase_dest rebase_src branchB
+git rebase --onto rebase_dest rebase_src branchC
+```
+
+The commit history that results will look like the following:
+
+```
+          ----o----o---o
+         /              \
+        |                \-----o---o---o  branchA
+        |                 \    
+    o----                  \--o---o---o  branchB
+                            \ 
+                             o---o---o  branchC
 ```
 
 
@@ -205,9 +292,9 @@ files and directories:
 
 ```
 $
+git branch branch1; git branch branch2; git branch branch3
 for BRANCH in branch1 branch2 branch3; do
 
-    git branch ${BRANCH}
     git checkout ${BRANCH}
     mkdir ${BRANCH}_data
     cd ${BRANCH}_data
@@ -221,33 +308,56 @@ for BRANCH in branch1 branch2 branch3; do
 done
 ```
 
-
-
-
-
-
-
-We illustrate the multi-branch case with the following
-git repository branch structure:
+The log should now look like the following:
 
 ```
-o           adding cat_branch1
+$ git log --oneline
+2acb13d (branch3) adding branch3_data
+a9473c6 (branch2) adding branch2_data
+bfc1937 (branch1) adding branch1_data
+859fb5d adding rat
+7d104ee adding fat
+ddf2903 adding dat
+765708d adding cat
+4c9f26f adding bat
+3b92007 adding bar.txt
+c2daf61 adding foo.txt
+```
+
+Visually, the commit history looks like this:
+
+```
+$ git lg2
+* 4221760 - 2019-04-09 10:45:30 (branch3)
+|             adding branch3_data - C Reid
+| * b83c9aa - 2019-04-09 10:45:28 (branch2)
+|/            adding branch2_data - C Reid
+| * f30c355 - 2019-04-09 10:45:26 (branch1)
+|/            adding branch1_data - C Reid
+* 859fb5d - 2019-04-09 10:34:19
+|           adding rat - C Reid
+* 7d104ee - 2019-04-09 10:34:19
+|           adding fat - C Reid
+* ddf2903 - 2019-04-09 10:34:18
+|           adding dat - C Reid
+* 765708d - 2019-04-09 10:34:18
+|           adding cat - C Reid
+* 4c9f26f - 2019-04-09 10:34:18
+|           adding bat - C Reid
+* 3b92007 - 2019-04-09 10:33:21
+|           adding bar.txt - C Reid
+* c2daf61 - 2019-04-09 10:33:14
+            adding foo.txt - C Reid
+```
+
+Or, drawing it a little more nicely:
+
+```
+o           adding branch3_data
 |
-o           adding bat_branch1
-|
-o           adding branch1.txt
-|
-|   o       adding cat_branch2
+|   o       adding branch2_data
 |   |
-|   o       adding bat_branch2
-|   |
-|   o       adding branch2.txt
-|   |
-|   |   o   adding cat_branch3
-|   |   |
-|   |   o   adding bat_branch3
-|   |   |
-|   |   o   adding branch3.txt
+|   |    o  adding branch1_data
 \   |   /
  \  |  /
   \ | /
@@ -273,11 +383,11 @@ o           adding branch1.txt
 
 # demo surgery: procedure
 
-In this demo surgery, we will show how to remove two types of files:
+In this demo surgery, we will show how to remove two files:
 
-* The `cat_branch1` file, which was added in a commit that is specific
-  to a single branch's commit history (this is essentially equivalent
-  to the [Easy Method](easy.md).
+* The `cat_branch1` file, which was only added to branch 1
+  (this is essentially the equivalent procedure to the 
+  single-branch [Easy Method](easy.md).)
 
 * The `cat` file, which was added in a commit that is common to
   multiple branches' commit histories (this is the more complicated case).
@@ -285,14 +395,15 @@ In this demo surgery, we will show how to remove two types of files:
 
 ## git forget blob: `cat_branch1` (branch specific history)
 
-We walk through how to remove a file added in a commit that
-only exists in the commit history of a single branch.
+We walk through how to remove a file that was only added
+to one branch.
 
 This procedure is basically equivalent to the
 [Easy Method](easy.md), which deals with a single
-branch. You are rewriting the history of one branch,
-so there will not be any other branches pointing to
-the old history when you are finished.
+branch. You are rewriting the last bit of the history
+of that one branch. When the old commits are changed
+to new commits, there will not be any other branches
+pointing to the old history, so things are not complicated.
 
 Start by checking out the branch:
 
