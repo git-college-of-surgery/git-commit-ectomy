@@ -238,8 +238,7 @@ done
 At this point the git log should look like this:
 
 ```
-$
-git log --oneline
+$ git log --oneline
 859fb5d (branch1) adding rat
 7d104ee adding fat
 ddf2903 adding dat
@@ -350,7 +349,7 @@ $ git lg2
             adding foo.txt - C Reid
 ```
 
-Or, drawing it a little more nicely:
+Or, drawing it with an ascii art tree:
 
 ```
 o           adding branch3_data
@@ -412,32 +411,87 @@ $
 git checkout branch1
 ```
 
-Check the size of the `.git` directory (before):
+Download the git forget blob script:
 
 ```
 $
-du -hs .git
+wget https://tinyurl.com/git-forget-blob-mac-sh -O git-forget-blob.sh
+chmod +x git-forget-blob.sh
+```
+
+Check the size of the `.git` directory (before):
+
+```
+$ du -hs .git
+
+290M	.git
 ```
 
 Now run the git forget blob script and pass the
 relative path to `cat_branch1` in the repository:
 
 ```
-$
-git-forget-blob.sh data1/cat_branch1
+$ ./git-forget-blob.sh branch1_data/cat_branch1
+
+Enumerating objects: 89, done.
+Counting objects: 100% (89/89), done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (81/81), done.
+Writing objects: 100% (89/89), done.
+Total 89 (delta 18), reused 0 (delta 0)
+Rewrite f30c3554eb89d764adb91244197dd62b58f10de2 (7/8) (1 seconds passed, remaining 0 predicted)    rm 'branch1_data/cat_branch1'
+
+Ref 'refs/heads/branch1' was rewritten
+Enumerating objects: 43, done.
+Counting objects: 100% (43/43), done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (33/33), done.
+Writing objects: 100% (43/43), done.
+Total 43 (delta 7), reused 36 (delta 2)
 ```
 
 Verify that the file was removed by checking the
 size of the `.git` directory (after):
 
 ```
-$
-du -hs .git
+$ du -hs .git
+
+100M	.git
+```
+
+Also check the log to ensure that branch 1 has a new commit
+history, and that no other branches had their histories
+affected:
+
+```
+$ git lg2
+
+* 4221760 - 2019-04-09 13:45:30 -0700 (4 hours ago) (branch3)
+|           adding branch3_data - C Reid
+| * b83c9aa - 2019-04-09 13:45:28 -0700 (4 hours ago) (branch2)
+|/            adding branch2_data - C Reid
+| * 70b607b - 2019-04-09 13:45:26 -0700 (4 hours ago) (HEAD -> branch1)
+|/            adding branch1_data - C Reid
+* 859fb5d - 2019-04-09 10:34:19 -0700 (7 hours ago)
+|           adding data2/rat - C Reid
+* 7d104ee - 2019-04-09 10:34:19 -0700 (7 hours ago)
+|           adding data2/fat - C Reid
+* ddf2903 - 2019-04-09 10:34:18 -0700 (7 hours ago)
+|           adding data1/dat - C Reid
+* 765708d - 2019-04-09 10:34:18 -0700 (7 hours ago)
+|           adding data1/cat - C Reid
+* 4c9f26f - 2019-04-09 10:34:18 -0700 (7 hours ago)
+|           adding data1/bat - C Reid
+* 3b92007 - 2019-04-09 10:33:21 -0700 (7 hours ago)
+|           adding bar.txt - C Reid
+* c2daf61 - 2019-04-09 10:33:14 -0700 (7 hours ago)
+            adding foo.txt - C Reid
 ```
 
 Now that you have rewritten the history of `branch1`
-and replaced each commit with a new one, force-push 
-the rewritten history to the remote:
+and replaced each commit with a new one, you can replace
+the history of the branch on the remote by doing a 
+force-push:
 
 ```
 $
@@ -463,88 +517,275 @@ have different hashes) and using those as the
 source and destination of our rebase operation.
 
 
-### forget blob in branch 1
+### forget blob in one branch
 
-We can remove a large file from any of the three
-branches; in this case we start with branch 1.
+We start by checking on the log (this uses the same
+repo as resulted from rewriting branch 1 only):
 
-Following the procedure above, we start by
-checking out the branch, and checking on the
+```
+$ git lg2
+
+* 4221760 - 2019-04-09 13:45:30 -0700 (4 hours ago) (branch3)
+|           adding branch3_data - C Reid
+| * b83c9aa - 2019-04-09 13:45:28 -0700 (4 hours ago) (branch2)
+|/            adding branch2_data - C Reid
+| * 70b607b - 2019-04-09 13:45:26 -0700 (4 hours ago) (HEAD -> branch1)
+|/            adding branch1_data - C Reid
+* 859fb5d - 2019-04-09 10:34:19 -0700 (7 hours ago)
+|           adding data2/rat - C Reid
+* 7d104ee - 2019-04-09 10:34:19 -0700 (7 hours ago)
+|           adding data2/fat - C Reid
+* ddf2903 - 2019-04-09 10:34:18 -0700 (7 hours ago)
+|           adding data1/dat - C Reid
+* 765708d - 2019-04-09 10:34:18 -0700 (7 hours ago)
+|           adding data1/cat - C Reid
+* 4c9f26f - 2019-04-09 10:34:18 -0700 (7 hours ago)
+|           adding data1/bat - C Reid
+* 3b92007 - 2019-04-09 10:33:21 -0700 (7 hours ago)
+|           adding bar.txt - C Reid
+* c2daf61 - 2019-04-09 10:33:14 -0700 (7 hours ago)
+            adding foo.txt - C Reid
+```
+
+We start by removing the large file `cat` from one
+of the branches, then rebase the other branches onto
+the new history that is created.
+
+Here, we remove the file `cat` from branch 2, and rebase
+branches 1 and 3 onto it.
+
+Start by checking out the branch, and checking on the
 size of the .git folder:
 
 ```
 $
-git checkout branch1
-du -hs .git
+git checkout branch2
 ```
 
-Now we run the forget blob script, and verify it
-shrank the `.git` directory:
+```
+$ du -hs .git
+
+100M	.git
+```
+
+Now we run the forget blob script:
+
+```
+$ ./git-forget-blob.sh data1/cat
+
+Enumerating objects: 43, done.
+Counting objects: 100% (43/43), done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (28/28), done.
+Writing objects: 100% (43/43), done.
+Total 43 (delta 7), reused 43 (delta 7)
+Rewrite 765708d262678c2bbc15dd5b999863ad5a4dab01 (4/8) (0 seconds passed, remaining 0 predicted)    rm 'data1/cat'
+Rewrite ddf2903c6d1fe41b171af7764579bc4d6a63e70f (5/8) (0 seconds passed, remaining 0 predicted)    rm 'data1/cat'
+Rewrite 7d104ee90da6b3adf08f9a86d2342e3c8690dc64 (6/8) (0 seconds passed, remaining 0 predicted)    rm 'data1/cat'
+Rewrite 859fb5d7db420b8aa745c50162b71c20331e90a9 (7/8) (0 seconds passed, remaining 0 predicted)    rm 'data1/cat'
+Rewrite b83c9aaecf238324aa2b8a51da1ac7f69015d4d4 (8/8) (0 seconds passed, remaining 0 predicted)    rm 'data1/cat'
+
+Ref 'refs/heads/branch2' was rewritten
+Enumerating objects: 51, done.
+Counting objects: 100% (51/51), done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (38/38), done.
+Writing objects: 100% (51/51), done.
+Total 51 (delta 9), reused 40 (delta 5)
+```
+
+Check the size of the `.git` directory:
+
+```
+$ du -hs .git
+100M	.git
+```
+
+It did not change! We can see why when we check the log:
+
+```
+$ git lg1
+* 4221760 - (4 hours ago) adding branch3_data - C Reid (branch3)
+| * 5e2b657 - (4 hours ago) adding branch2_data - C Reid (HEAD -> branch2)
+| * 6ec8be5 - (7 hours ago) adding data2/rat - C Reid
+| * 15ec3be - (7 hours ago) adding data2/fat - C Reid
+| * 03a671e - (7 hours ago) adding data1/dat - C Reid
+| * 3cda75c - (7 hours ago) adding data1/cat - C Reid
+| | * 70b607b - (4 hours ago) adding branch1_data - C Reid (branch1)
+| |/
+|/|
+* | 859fb5d - (7 hours ago) adding data2/rat - C Reid
+* | 7d104ee - (7 hours ago) adding data2/fat - C Reid
+* | ddf2903 - (7 hours ago) adding data1/dat - C Reid
+* | 765708d - (7 hours ago) adding data1/cat - C Reid
+|/
+* 4c9f26f - (7 hours ago) adding data1/bat - C Reid
+* 3b92007 - (7 hours ago) adding bar.txt - C Reid
+* c2daf61 - (7 hours ago) adding foo.txt - C Reid
+
+```
+
+branch 1 and branch 3 still refer to the old commit that added `cat`,
+so the full contents of the `cat` file are still in the `.git` directory's
+blobs. 
+
+Now that branch 2 has a new version of the shared history,
+we want to rebase branch 1 and branch 3.
+
+
+### prepare for rebase by tagging commits
+
+Start the rebase operation for the remaining branches by
+labeling our rebase source and destination commits. As
+shown in the ascii art diagrams at the top of the page,
+we want to find the last commit that our branches shared
+in common in their commit history, and mark that commit
+in the old history as the "rebase source" and mark that
+commit in the new history as the "rebase destination".
+
+In the case of our example, the commit that adds the file
+`rat` is the last commit all our branches have in common.
+
+This means that the rebase source will be the version of 
+the "adding rat" commit that is in the old history (the 
+history of branch 1 and branch 3) - commit `859fb5d`.
+
+The rebase destination will be the version of the "adding
+rat" commit that is in the new history of branch 2,
+which corresponds to commit `6ec8be5`.
+
+Mark these two commits as the `rebase_src` and `rebase_dest`
+branches:
+
+```
+git checkout 859fb5d
+git checkout -b rebase_src
+
+git checkout 6ec8be5
+git checkout -b rebase_dest
+```
+
+Now here is the state of the repo:
+
+```
+$ git lg1
+* 4221760 - (5 hours ago) adding branch3_data - C Reid (branch3)
+| * 5e2b657 - (5 hours ago) adding branch2_data - C Reid (branch2)
+| * 6ec8be5 - (8 hours ago) adding data2/rat - C Reid (HEAD -> rebase_dest)
+| * 15ec3be - (8 hours ago) adding data2/fat - C Reid
+| * 03a671e - (8 hours ago) adding data1/dat - C Reid
+| * 3cda75c - (8 hours ago) adding data1/cat - C Reid
+| | * 70b607b - (5 hours ago) adding branch1_data - C Reid (branch1)
+| |/
+|/|
+* | 859fb5d - (8 hours ago) adding data2/rat - C Reid (rebase_src)
+* | 7d104ee - (8 hours ago) adding data2/fat - C Reid
+* | ddf2903 - (8 hours ago) adding data1/dat - C Reid
+* | 765708d - (8 hours ago) adding data1/cat - C Reid
+|/
+* 4c9f26f - (8 hours ago) adding data1/bat - C Reid
+* 3b92007 - (8 hours ago) adding bar.txt - C Reid
+* c2daf61 - (8 hours ago) adding foo.txt - C Reid
+```
+
+
+### perform rebase operation
+
+Start the rebase operation by checking out branch 2:
 
 ```
 $
-git-forget-blob.sh data1/cat
-du -hs .git
+git checkout branch2
 ```
 
-Now, branch 1 has a different commit history 
-from branch 2 and branch 3, going all the way
-back to the commit that added `cat`:
+Now rebase branch 1 from the old history onto the new history:
 
 ```
-o           Add cat_branch1
-|
-o           Add bat_branch1
-|
-o           Add branch1.txt
-|
-|   o       Add cat_branch2
-|   |
-|   o       Add bat_branch2
-|   |
-|   o       Add branch2.txt
-|   |
-|   |   o   Add cat_branch3
-|   |   |
-|   |   o   Add bat_branch3
-|   |   |
-|   |   o   Add branch3.txt
-\   |   /
- \  |  /
-  \ | /
-   \|/
-    o       Add rat
-    |
-    o       Add fat
-    |
-    o       Add dat
-    |
-    o       Add cat
-    |
-    o       Add bat
-    |
-    o       Add bar.txt
-    |
-    o       Add foo.tx
-    |
-    |
-   [ ] 
+$ git rebase --onto rebase_dest rebase_src branch1
 
+First, rewinding head to replay your work on top of it...
+Applying: adding branch1_data
 ```
 
+Verify that branch 1 and branch 2 now share a commit history:
 
-### git rebase branch 2 and branch 3
+```
+$ git lg1
+* 2af1225 - (5 hours ago) adding branch1_data - C Reid (HEAD -> branch1)
+| * 4221760 - (5 hours ago) adding branch3_data - C Reid (branch3)
+| * 859fb5d - (8 hours ago) adding data2/rat - C Reid (rebase_src)
+| * 7d104ee - (8 hours ago) adding data2/fat - C Reid
+| * ddf2903 - (8 hours ago) adding data1/dat - C Reid
+| * 765708d - (8 hours ago) adding data1/cat - C Reid
+| | * 5e2b657 - (5 hours ago) adding branch2_data - C Reid (branch2)
+| |/
+|/|
+* | 6ec8be5 - (8 hours ago) adding data2/rat - C Reid (rebase_dest)
+* | 15ec3be - (8 hours ago) adding data2/fat - C Reid
+* | 03a671e - (8 hours ago) adding data1/dat - C Reid
+* | 3cda75c - (8 hours ago) adding data1/cat - C Reid
+|/
+* 4c9f26f - (8 hours ago) adding data1/bat - C Reid
+* 3b92007 - (8 hours ago) adding bar.txt - C Reid
+* c2daf61 - (8 hours ago) adding foo.txt - C Reid
+```
 
+Repeat the process with branch 3:
 
+```
+$ git rebase --onto rebase_dest rebase_src branch3
 
+First, rewinding head to replay your work on top of it...
+Applying: adding branch3_data
+```
 
+Verify that all three branches now share a commit history:
 
+```
+$ git lg1
 
+* b5642eb - (5 hours ago) adding branch3_data - C Reid (HEAD -> branch3)
+| * 2af1225 - (5 hours ago) adding branch1_data - C Reid (branch1)
+|/
+| * 5e2b657 - (5 hours ago) adding branch2_data - C Reid (branch2)
+|/
+* 6ec8be5 - (8 hours ago) adding data2/rat - C Reid (rebase_dest)
+* 15ec3be - (8 hours ago) adding data2/fat - C Reid
+* 03a671e - (8 hours ago) adding data1/dat - C Reid
+* 3cda75c - (8 hours ago) adding data1/cat - C Reid
+| * 859fb5d - (8 hours ago) adding data2/rat - C Reid (rebase_src)
+| * 7d104ee - (8 hours ago) adding data2/fat - C Reid
+| * ddf2903 - (8 hours ago) adding data1/dat - C Reid
+| * 765708d - (8 hours ago) adding data1/cat - C Reid
+|/
+* 4c9f26f - (8 hours ago) adding data1/bat - C Reid
+* 3b92007 - (8 hours ago) adding bar.txt - C Reid
+* c2daf61 - (8 hours ago) adding foo.txt - C Reid
+```
 
+Last, delete the rebase source and destination branches, so nothing points
+at the problematic commits or the old history:
 
+```
+$
+git branch -D rebase_src rebase_dest
+```
 
+Check the log to make sure we only see the new history:
 
-
-
-
+```
+$ git lg1
+* b5642eb - (5 hours ago) adding branch3_data - C Reid (HEAD -> branch3)
+| * 2af1225 - (5 hours ago) adding branch1_data - C Reid (branch1)
+|/
+| * 5e2b657 - (5 hours ago) adding branch2_data - C Reid (branch2)
+|/
+* 6ec8be5 - (8 hours ago) adding data2/rat - C Reid (rebase_dest)
+* 15ec3be - (8 hours ago) adding data2/fat - C Reid
+* 03a671e - (8 hours ago) adding data1/dat - C Reid
+* 3cda75c - (8 hours ago) adding data1/cat - C Reid
+* 4c9f26f - (8 hours ago) adding data1/bat - C Reid
+* 3b92007 - (8 hours ago) adding bar.txt - C Reid
+* c2daf61 - (8 hours ago) adding foo.txt - C Reid
+```
 
