@@ -130,17 +130,17 @@ If you have an absolute clusterf--k of a commit history,
 you need a gifted surgeon. The more gifted the surgeon,
 the more of your repo history you'll be able to retain.
 
-**Surgery with a Battle Axe:** A minimal-complications method
-that removes more of your history than you'd probably want
-(see above note about gifted surgeons).
+Here is a minimal-complications method that removes more 
+of your history than you'd probably want
+(see above note about finding a gifted surgeon). 
 
-The battle axe method is to leapfrog a whole series of 
+This method is to leapfrog a whole series of 
 complicated splits, merges, rebases, and other tangles,
 and jump directly to a point in the repo where things 
 are saner and calmer. This is done by creating two commits
 (two repo states) that are exactly identical, and which
 can be used as the source and destination of a git rebase 
-operation.)
+operation.
 
 The battle axe method requires adding one commit to 
 the clusterf--ked branch, which will modify the state
@@ -178,3 +178,4 @@ conflicts.
 Note that you will lose all information about commits 
 that are not rebased or cherry picked, i.e., all the 
 commits that were involved with the clusterf--k.
+
