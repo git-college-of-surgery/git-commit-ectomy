@@ -1,7 +1,10 @@
 This page walks through a demonstration
 git-commit-ectomy that you can perform
 starting with an empty git repository.
-It addresses the single-branch case.
+
+It addresses the **single-branch case**.
+
+![Painting: The Agnew Clinic (Eakins 1889).](img/eakins-the-agnew-clinic-1889.jpg)
 
 <br />
 <br />

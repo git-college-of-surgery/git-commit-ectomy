@@ -1,18 +1,24 @@
 # Oh F&!k: Please Send Backup
 
+![Painting: The Gross Clinic (Eakins 1875)](img/eakins-the-gross-clinic-1875.jpg)
+
+<br />
+<br />
+
 When you use the single-branch procedure
 instead of the multi-branch procedure...
-this is what happens.
+bad things happen.
 
-Possible complications to all of this 
-include:
+Possible complications to all of this include:
 
-* Users who did not get the memo about rewriting the entire
-    history of the git reopsitory and did not clone a fresh
-    copy of the repo once the new history was pushed, and continue
-    to push the old history to the remote. (This can be proactively
-    dealt with by using branch protection, but you may need to
-    retroactively deal with this problem);
+* Users who did not get the memo about the entire history
+    of the repository being rewritten, who did not 
+    listen when they were told to clone a fresh copy,
+    and who pushed directly to master even though
+    they were told repeatedly not to, so then you
+    end up with the entire old history being pushed
+    to the remote. (Deal with this proactively by
+    protecting the master branch!)
 
 * Accidentally carrying out the procedure multiple times,
     resulting in 2, 3, 4, even 5 copies of each commit,

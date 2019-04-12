@@ -26,6 +26,7 @@ nav:
   - 'Index' : 'index.md'
   - 'Git-Commit-Ectomy the Easy Way: Single Branch' : 'easy.md'
   - 'Complications: Dealing with Branches' : 'branches.md'
+  - 'Performing Transplants with Patch' : 'transplant.md'
   - 'Oh F&!k: Please Send Backup' : 'ohfk.md'
 
 strict: true

@@ -1,7 +1,10 @@
 This page walks through a demonstration
 git-commit-ectomy that you can perform
 starting with an empty git repository.
-It addresses the multi-branch case.
+
+It addresses the **multi-branch case**.
+
+![Painting: Morton and the First Use of Ether (Hinkley 1893).](img/william-morton-first-use-ether.jpg)
 
 <br />
 <br />
