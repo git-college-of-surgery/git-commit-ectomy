@@ -484,7 +484,6 @@ whatever commit history it currently has with the
 commit history that we are pushing.
 
 ```
-$ 
 git push origin master --force
 ```
 
@@ -504,8 +503,9 @@ And a screenshot of the repo after:
 
 **Size up your patient before you start.**
 
-Use the one-liner in the ["Consult with your Doctor" section](#consult-with-your-doctor)
-section to size up your patient before you start
+Use the one-liner in the ["Consult with your Doctor" 
+section](#consult-with-your-doctor)
+to size up your patient before you start
 (modify the tail line to change the number of files).
 
 **Get your patient some insurance.** 
