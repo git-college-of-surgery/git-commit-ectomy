@@ -20,10 +20,11 @@ It addresses the **multi-branch case**.
 * [demo surgery: procedure](#demo-surgery-procedure)
     * [git forget blob: cat\_branch1 (branch specific history)](#git-forget-blob-cat_branch1-branch-specific-history)
     * [git forget blob: cat (shared history)](#git-forget-blob-cat-shared-history)
-        * [forget blob in one branch](#forget-blob-in-one-branch)
-        * [prepare for rebase by tagging commits](#prepare-for-rebase-by-tagging-commits)
-        * [perform rebase operation](#perform-rebase-operation)
-
+    * [forget blob in one branch](#forget-blob-in-one-branch)
+    * [prepare for rebase by tagging commits](#prepare-for-rebase-by-tagging-commits)
+    * [perform rebase operation](#perform-rebase-operation)
+    * [stitch the patient back up](#stitch-the-patient-back-up)
+* [tips for surgery](#tips-for-surgery)
 
 <br />
 <br />
@@ -43,7 +44,6 @@ git-commit-ectomy is right for you.
 This one-liner lists the 40 largest files in the repo:
 
 ```
-$ 
 git rev-list --all --objects | \
      sed -n $(git rev-list --objects --all | \
      cut -f1 -d' ' | \
@@ -167,7 +167,6 @@ a remote repository to do the demo surgery, but we will use one
 in our walkthrough.
 
 ```
-$ 
 git clone https://github.com/charlesreid1/git-commit-ectomy-example
 cd git-commit-ectomy-example
 ```
@@ -177,7 +176,6 @@ using the default `master` branch. Start by renaming the `master` branch
 to `branch1`:
 
 ```
-$
 git branch branch1
 git checkout branch1
 ```
@@ -185,7 +183,6 @@ git checkout branch1
 Start with several text files, and add them to the repo history:
 
 ```
-$
 echo "hello foo" > foo.txt
 echo "hello bar" > bar.txt
 
@@ -198,14 +195,12 @@ Now add several large files to the repo history:
 
 
 ```
-$ 
 mkdir data1; mkdir data2
 ```
 
 Now create some files in each of the two directories:
 
 ```
-$ 
 cd data1/
 dd if=/dev/urandom of=bat bs=1048576 count=10
 dd if=/dev/urandom of=cat bs=1048576 count=10
@@ -222,8 +217,7 @@ cd ../
 This gives the following directory structure:
 
 ```
-$
-tree .
+$ tree .
 .
 ├── bar.txt
 ├── data1
@@ -239,7 +233,6 @@ tree .
 Add the files to the repo in _separate commits_:
 
 ```
-$
 for item in data1/bat data1/cat data1/dat data2/fat data2/rat; do
     git add ${item} && git commit ${item} -m "adding ${item}"
 done
@@ -300,7 +293,6 @@ Here are the commands to create the branch-specific
 files and directories:
 
 ```
-$
 git branch branch1; git branch branch2; git branch branch3
 for BRANCH in branch1 branch2 branch3; do
 
@@ -417,14 +409,12 @@ pointing to the old history, so things are not complicated.
 Start by checking out the branch:
 
 ```
-$
 git checkout branch1
 ```
 
 Download the git forget blob script:
 
 ```
-$
 wget https://tinyurl.com/git-forget-blob-mac-sh -O git-forget-blob.sh
 chmod +x git-forget-blob.sh
 ```
@@ -500,7 +490,6 @@ the history of the branch on the remote by doing a
 force-push:
 
 ```
-$
 git push origin master --force
 ```
 
@@ -563,7 +552,6 @@ Start by checking out the branch, and checking on the
 size of the .git folder:
 
 ```
-$
 git checkout branch2
 ```
 
@@ -697,14 +685,12 @@ $ git lg1
 Start the rebase operation by checking out branch 2:
 
 ```
-$
 git checkout branch2
 ```
 
 Now rebase branch 1 from the old history onto the new history:
 
 ```
-$ 
 git rebase --onto rebase_dest rebase_src branch1
 ```
 
@@ -741,7 +727,6 @@ $ git lg1
 Repeat the process with branch 3:
 
 ```
-$
 git rebase --onto rebase_dest rebase_src branch3
 ```
 
@@ -779,7 +764,6 @@ Last, delete the rebase source and destination branches, so nothing points
 at the problematic commits or the old history:
 
 ```
-$
 git branch -D rebase_src rebase_dest
 ```
 
@@ -800,4 +784,69 @@ $ git lg1
 * 3b92007 - (8 hours ago) adding bar.txt - C Reid
 * c2daf61 - (8 hours ago) adding foo.txt - C Reid
 ```
+
+Congratulations, you've completed a multi-branch git-commit-ectomy!
+
+## stitch the patient back up
+
+As with all surgeries, the last step is just as 
+important as the first.
+
+All of the blobs for the old commits have been erased
+from the `.git` directory and we're ready to push
+the new, slimmer, rewritten history to the remote.
+
+But as before, we _must_ do a force push, otherwise
+both histories will be kept. To force push:
+
+```
+git push origin master --force
+```
+
+# tips for surgery
+
+**Size up your patient before you start.**
+
+Use the one-liner in the ["Consult with your Doctor" 
+section](#consult-with-your-doctor)
+to size up your patient before you start.
+
+**Get your patient some insurance.** 
+
+Back up any files you want to remove but still want to keep.
+
+**Make sure you specify relative paths to file names.** 
+
+The `git-forget-blob.sh` script requires you to specify the
+path to the file you want to remove, _relative to the top
+level directory of the repository_.
+
+Like this:
+
+```
+# CORRECT
+./git-forget-blob.sh data/my_project/phase-1/proprietary/super_huge.file
+```
+
+Not like this:
+
+```
+# INCORRECT
+./git-forget-blob.sh super_huge.file
+```
+
+The long one-liner in the ["Consult with your Doctor" 
+section](#consult-with-your-doctor)
+will list the largest files in the repository, with the relative
+path to that file (relative to the root of the repository).
+
+If you pass it a filename without a path to the file,
+the script will most likely complain that the file could
+not be found. But it may attempt to remove the file and 
+rewrite history _anyway_ without removing any files.
+
+If you are running `git-forget-blob.sh` and the size of the 
+`.git` folder is not going down, it may be because you are
+specifying an incorrect path to the files you are trying to 
+remove.
 
