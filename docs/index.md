@@ -25,13 +25,13 @@ shape.
 
 ## the procedure
 
-This surgical procedure can happen one of three ways:
+This surgical procedure can happen one of four ways:
 
 * Git-Commit-Ectomy the Easy Way: [Single Branch](easy.md)
 
 * Complications: [Dealing with Branches](branches.md)
 
-* Git-Commit-Ectomy the Hard Way: [Cherry Picking](cherrypicking.md)
+* Transplants: [Performing a Transplant with Patch](transplant.md)
 
 * Oh F&!k: [Please Send Backup](ohfk.md)
 
