@@ -208,30 +208,26 @@ git branch new_master
 git checkout new_master
 ```
 
-Now, you want to bring the repository into the same state
-as the (clusterf--ked) branch, at commit D.
-
-To do this, copy every single file present in the folder 
-at commit D, into the repository staging area for commit D'.
+Now, add a commit at A that will bring the repository into the 
+_exact_ same state as the (clusterf--ked) branch (that is, commit D).
+To do this, copy every single file present in the folder at commit D,
+into the repository staging area for commit D'.
 
 You must copy every single file that is in that folder in commit D,
 _excatly, word for word, character for character_, into D'.
 
-If there are files that are in A but not in D, those files
-are extra and can be left alone without a problem. 
+If any files are in A but not in D, those files
+are extra and can be left alone without a problem.  
 
-If there are files that are in D but not in A, you _must_ 
+If any files are in D but not in A, you _must_ 
 add those files in when you create commit D'.
 
 Once your staged commit D' matches the staged commit D,
-commit your changes.
-
-Tag these two commits as your "Stargates" - these two
-commits are linked, because the repository is in exactly 
-the same state between commit D and commit D'.
-
-Commit D is the stargate source, commit D' is the stargate 
-destination.
+commit your changes. Tag these two commits, D and D',
+as your "stargates" - commit D is your stargate source,
+and commit D' is your stargate destination. These commits
+are linked because the repository is in exactly the same
+state between commit D and commit D'.
 
 The last step is to rebase any commits that were made
 after the mess, that is, made after commit D, onto the new
@@ -285,4 +281,7 @@ Finally, push the `new_master` branch to the remote:
 ```
 git push origin new_master
 ```
+
+Pat yourself on the back - you've successfully unf--ked 
+the repository.
 
